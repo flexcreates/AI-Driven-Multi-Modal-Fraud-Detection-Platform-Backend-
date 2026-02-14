@@ -11,6 +11,7 @@ This is the backend system for a comprehensive fraud detection platform. It orch
 - **Explainable AI**: SHAP-based explanation for fraud decisions.
 - **Security**: JWT authentication, RBAC, input validation.
 - **Alerting**: Real-time webhook notifications.
+- **Logging**: Centralized, routed logging for full pipeline visibility.
 
 ## 🛠️ Technology Stack
 - **Framework**: FastAPI (Python 3.12+)

@@ -35,6 +35,8 @@ wheels/
 # Project Specific
 .env
 *.log
+SRC/logs/*.log
+!SRC/logs/.keep
 *.sqlite
 .DS_Store
 

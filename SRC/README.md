@@ -33,6 +33,22 @@ SRC/
 - Configures SQLAlchemy engine and session factory.
 - Provides `get_db()` dependency for dependency injection in API routes.
 
+## 📝 Logging System
+The project uses a centralized logging system located in `SRC/logs/logger.py`.
+Logs are routed to specific files in `SRC/logs/` based on the component:
+
+- **`backend_main.log`**: General application lifecycle events (Startup/Shutdown).
+- **`api.log`**: FastAPI request handling and route-specific logs.
+- **`database.log`**: Database connection events and SQL errors.
+- **`models.log`**: AI model inference logs (inputs/outputs/errors).
+
+To use the logger in your module:
+```python
+from SRC.logs.logger import get_logger
+logger = get_logger("api.my_module") # Will route to api.log
+logger.info("This is an info message")
+```
+
 ## 🚀 Development
 To run the application locally:
 ```bash
