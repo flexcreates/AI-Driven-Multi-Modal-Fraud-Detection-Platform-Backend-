@@ -54,14 +54,22 @@ BACKEND_API/
 
 ## 🚀 Setup Instructions
 
-### 1. Environment Setup
+### 1. Automated Setup (Recommended)
+Run the universal setup script which handles environment creation, dependencies, and database config:
+```bash
+python project_setup.py
+```
+
+### 2. Manual Setup
+If you prefer manual installation:
 ```bash
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+python init_db.py
 ```
 
-### 2. Database Configuration
+### 3. Database Configuration
 Create a `.env` file in the project root:
 ```ini
 POSTGRES_USER=postgres
