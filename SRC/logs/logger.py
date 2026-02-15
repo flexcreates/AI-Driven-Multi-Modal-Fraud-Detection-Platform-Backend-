@@ -9,17 +9,20 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # Log format
 FORMATTER = logging.Formatter("[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s")
 
+
 def get_logger(name: str) -> logging.Logger:
     """
     Returns a configured logger based on the component name.
     Routes logs to specific files:
-    - api.* -> logs/api.log
-    - database.* -> logs/database.log
-    - models.* -> logs/models.log
-    - main -> logs/backend_main.log
+    - api.*       -> logs/api.log
+    - database.*  -> logs/database.log
+    - models.*    -> logs/models.log
+    - services.*  -> logs/services.log
+    - middleware.* -> logs/middleware.log
+    - main        -> logs/backend_main.log
     """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Capture all logs
+    logger.setLevel(logging.DEBUG)
 
     # Avoid adding multiple handlers if logger is already configured
     if logger.hasHandlers():
@@ -32,6 +35,10 @@ def get_logger(name: str) -> logging.Logger:
         log_file = "database.log"
     elif name.startswith("models"):
         log_file = "models.log"
+    elif name.startswith("services"):
+        log_file = "services.log"
+    elif name.startswith("middleware"):
+        log_file = "middleware.log"
     else:
         log_file = "backend_main.log"
 
@@ -42,7 +49,7 @@ def get_logger(name: str) -> logging.Logger:
     file_handler.setFormatter(FORMATTER)
     file_handler.setLevel(logging.DEBUG)
 
-    # Console Handler (Optional: for seeing logs in docker/terminal)
+    # Console Handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(FORMATTER)
     console_handler.setLevel(logging.INFO)

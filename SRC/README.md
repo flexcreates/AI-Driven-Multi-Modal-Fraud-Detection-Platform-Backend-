@@ -1,82 +1,67 @@
-# AI-Driven Multi-Modal Fraud Detection Platform - Backend API
+# Backend API — Source Code Documentation
 
 ## 📌 Overview
-This is the backend API for a professional Fraud Detection Platform. It is built using **FastAPI** and is fully asynchronous, leveraging **PostgreSQL** (via `asyncpg` + `SQLAlchemy`) for high-performance database interactions.
+Fully asynchronous FastAPI backend with PostgreSQL (asyncpg + SQLAlchemy). Provides JWT authentication and multi-modal fraud analysis.
 
-The system provides:
-- **User Authentication**: Secure JWT-base login and registration.
-- **Risk Analysis**: Evaluates Text, URLs, and Files for fraud risk.
-- **Risk Engine**: Calculates risk scores and makes decisions (ALLOW/FLAG/BLOCK).
-- **Audit Logging**: Asynchronously logs all analysis requests for compliance.
+## 📂 Module Breakdown
 
-## 📂 Project Structure
+### `main.py` — Application Entry Point
+Initializes the FastAPI app, registers middleware (CORS, request logging), and includes routers.
+- **Start:** `uvicorn SRC.main:app --reload`
+- **Health:** `GET /health` → `{"status": "UP", "version": "1.0.0"}`
 
-```
-SRC/
-├── api/            # API Routes (Auth, Analysis)
-├── config/         # Environment Configuration
-├── core/           # Security (JWT, Hashing)
-├── database/       # Async Database Session & Base
-├── models/         # SQLAlchemy ORM Models
-├── schemas/        # Pydantic Request/Response Models
-├── services/       # AI & Risk Logic
-└── main.py         # App Entry Point
-```
+### `api/` — Route Handlers
+| File | Endpoints |
+|------|-----------|
+| `api/deps.py` | `get_current_user`, `get_current_active_user` (auth dependencies) |
+| `api/docs/auth.py` | `POST /auth/register`, `POST /auth/token` |
+| `api/v1/endpoints/analysis.py` | `POST /analyze/text|url|file|image`, `GET /analyze/history` |
 
-## 🚀 Getting Started
+### `config/settings.py` — Configuration
+Pydantic `BaseSettings` loading from `.env`: database credentials, JWT secret, token expiry.
 
-### 1. Prerequisites
-- Python 3.9+
-- PostgreSQL
-- Virtual Environment
+### `core/security.py` — Security Utilities
+- `create_access_token()` — JWT generation (HS256, 30min default)
+- `verify_password()` / `get_password_hash()` — bcrypt hashing
 
-### 2. Environment Setup
-Create a `.env` file in the root directory:
-```bash
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=yourpassword
-POSTGRES_SERVER=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=fraud_detection_db
-SECRET_KEY=your_super_secret_key
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
+### `database/` — Database Layer
+- `base.py` — SQLAlchemy `Base` declarative model
+- `session.py` — Async engine, session factory, `get_db()` dependency
 
-### 3. Installation
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+### `models/` — SQLAlchemy ORM Models
+| Model | Table | Description |
+|-------|-------|-------------|
+| `User` | `users` | User accounts with roles |
+| `AnalysisRecord` | `analysis_logs` | Analysis request records |
+| `ApiKey` | `api_keys` | API key management |
+| `RiskComponent` | `risk_components` | Breakdown of risk scores |
+| `Alert` | `alerts` | Alert/notification records |
+| `AuditLog` | `audit_logs` | System audit trail |
 
-### 4. Database Setup
-The application uses SQLAlchemy for ORM. Tables are created automatically on startup (dev mode) or via migration scripts.
-*Note: Ensure your PostgreSQL server is running and the database exists.*
+### `schemas/` — Pydantic Models
+- `user.py` — `UserCreate`, `UserLogin`, `UserResponse`, `Token`
+- `analysis.py` — `TextAnalysisRequest`, `UrlAnalysisRequest`, `AnalysisResponse`
 
-## 🏃 Running the Application
-Start the development server with hot-reload:
-```bash
-uvicorn SRC.main:app --reload
-```
-The API will be available at: `http://localhost:8000`
-Interactive Documentation: `http://localhost:8000/docs`
+### `services/` — Business Logic
+- `ai_service.py` — Mock AI analysis functions (text, url, file, image). **Replace with real models.**
+- `risk_engine.py` — Calculates risk score, level (LOW/MEDIUM/HIGH), and decision (ALLOW/FLAG/BLOCK).
+
+### `middleware/middleware.py` — Middleware
+- `RequestLoggingMiddleware` — Logs method, path, status code, duration for every request
+- `CORS_CONFIG` — Pre-configured allowed origins for frontend dev servers
+
+### `logs/logger.py` — Logging System
+Rotating file handlers (5MB, 3 backups) routing logs by component:
+| Logger Name | Log File |
+|------------|----------|
+| `api.*` | `api.log` |
+| `database.*` | `database.log` |
+| `services.*` | `services.log` |
+| `middleware.*` | `middleware.log` |
+| `main` | `backend_main.log` |
 
 ## 🧪 Testing
-The project includes a comprehensive Async Test Suite using `pytest`.
 ```bash
-PYTHONPATH=. pytest
+PYTHONPATH=. pytest -v
 ```
-Tests cover:
-- User Registration & Login
-- JWT Token Generation
-- Text, URL, and File Analysis flows
-- Database Persistence
-
-## 🔑 Key Features
-- **Async/Await**: Fully non-blocking I/O for database and generic tasks.
-- **Security**: Password hashing with `bcrypt`, JWT for stateless auth.
-- **Validation**: Strict data validation using `Pydantic`.
-- **Modularity**: Clean architecture separating Routes, Services, and Repositories.
-
-## 📄 API Documentation
-For detailed API endpoint usage, see [SRC/api/API_README.md](api/API_README.md).
+14 tests across `test_auth.py`, `test_analysis.py`, and `test_health.py`.

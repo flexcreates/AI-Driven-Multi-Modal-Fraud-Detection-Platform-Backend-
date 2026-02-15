@@ -1,40 +1,57 @@
 # Database Module Documentation
 
 ## 📂 Overview
-The `DATABASE` directory contains all SQL scripts and migration files necessary for setting up and managing the PostgreSQL database for the Fraud Detection Platform.
+PostgreSQL database for the Fraud Detection Platform. Contains schema definitions, seed data, and migration scripts.
 
 ## 📝 Files
 
-### `schema.sql`
-- Contains the DDL (Data Definition Language) statements to create the database schema.
-- Tables included:
-    - **users**: System users and roles.
-    - **api_keys**: API keys for external access.
-    - **analysis_logs**: Logs of fraud analysis requests.
-        - Supports `TEXT`, `URL`, `DOCUMENT`, `IMAGE`, `MULTIMODAL`.
-    - **risk_components**: Breakdown of risk scores.
-        - Includes `text_score`, `url_score`, `metadata_score`, `malware_score`.
-    - **alerts**: Notification records.
-    - **audit_logs**: System audit trail.
+### `schema.sql` — Database Schema
+Creates 6 tables with constraints and indexes:
 
-### `seed_data.sql`
-- Contains initial data for testing and development.
-- Creates default users:
-    - Admin (`admin@fraudplatform.com`)
-    - Analyst (`analyst@fraudplatform.com`)
-    - Client (`client@fraudplatform.com`) with a valid API key.
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `users` | User accounts | `id`, `email`, `name`, `hashed_password`, `role`, `is_active` |
+| `api_keys` | API key management | `user_id`, `api_key`, `status`, `expires_at` |
+| `analysis_logs` | Analysis request records | `user_id`, `input_type`, `input_hash`, `risk_score`, `risk_level`, `decision`, `details`, `status` |
+| `risk_components` | Risk score breakdown | `analysis_id`, `text_score`, `url_score`, `metadata_score`, `malware_score` |
+| `alerts` | Notification records | `analysis_id`, `alert_type`, `sent_to`, `status` |
+| `audit_logs` | System audit trail | `user_id`, `action`, `ip_address` |
+
+**Indexes:** `users(email)`, `api_keys(api_key)`, `analysis_logs(user_id)`, `analysis_logs(created_at)`
+
+### `seed_data.sql` — Initial Test Data
+Creates 3 default users:
+| Email | Role | Password |
+|-------|------|----------|
+| `admin@fraudplatform.com` | `BANK_ADMIN` | `admin123` |
+| `analyst@fraudplatform.com` | `SOC_ANALYST` | `admin123` |
+| `client@fraudplatform.com` | `USER` | `admin123` |
+
+Also creates an API key for the client user.
+
+### `migrations/` — Migration Scripts
+Reserved directory for future database migrations (currently empty — tables are created via `init_db.py`).
 
 ## 🛠️ Usage
 
-### Initialization
-To initialize the database, run the `init_db.py` script from the project root:
+### Initialize Database
 ```bash
 python init_db.py
 ```
+Creates the database if it doesn't exist, runs `schema.sql`, then `seed_data.sql`.
 
-### Resetting
-To **destroy** the database and re-create it (useful during development after schema changes):
+### Reset Database (Destructive)
 ```bash
-python reset_db.py
+python reset_db.py           # Interactive confirmation
+python reset_db.py --force   # Skip confirmation
 ```
-*Warning: This deletes all data!*
+**⚠️ Warning: This drops and recreates the entire database, deleting all data.**
+
+## 📐 Entity Relationships
+```
+users ──1:N──▶ analysis_logs
+users ──1:N──▶ api_keys
+users ──1:N──▶ audit_logs
+analysis_logs ──1:N──▶ risk_components
+analysis_logs ──1:N──▶ alerts
+```

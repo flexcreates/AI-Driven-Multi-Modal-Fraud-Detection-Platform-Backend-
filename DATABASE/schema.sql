@@ -10,6 +10,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
     role VARCHAR(50) CHECK (role IN ('USER', 'BANK_ADMIN', 'SOC_ANALYST')) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -32,6 +33,8 @@ CREATE TABLE analysis_logs (
     risk_score FLOAT CHECK (risk_score >= 0 AND risk_score <= 1),
     risk_level VARCHAR(50) CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH')),
     decision VARCHAR(50) CHECK (decision IN ('ALLOW', 'FLAG', 'BLOCK')),
+    details JSONB DEFAULT '{}', -- Extended info (risk components, AI details)
+    status VARCHAR(50) CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')) DEFAULT 'PENDING',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
