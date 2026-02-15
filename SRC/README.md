@@ -1,59 +1,82 @@
-# Source Code Documentation (SRC)
+# AI-Driven Multi-Modal Fraud Detection Platform - Backend API
 
-## 📂 Structure Overview
-The `SRC` directory contains the core application logic for the AI-Driven Multi-Modal Fraud Detection Platform.
+## 📌 Overview
+This is the backend API for a professional Fraud Detection Platform. It is built using **FastAPI** and is fully asynchronous, leveraging **PostgreSQL** (via `asyncpg` + `SQLAlchemy`) for high-performance database interactions.
+
+The system provides:
+- **User Authentication**: Secure JWT-base login and registration.
+- **Risk Analysis**: Evaluates Text, URLs, and Files for fraud risk.
+- **Risk Engine**: Calculates risk scores and makes decisions (ALLOW/FLAG/BLOCK).
+- **Audit Logging**: Asynchronously logs all analysis requests for compliance.
+
+## 📂 Project Structure
 
 ```
 SRC/
-├── api/            # API Endpoints (Routes)
-├── config/         # Configuration Settings
-├── core/           # Core functionality (Logging, Exceptions)
-├── database/       # Database connection & session management
+├── api/            # API Routes (Auth, Analysis)
+├── config/         # Environment Configuration
+├── core/           # Security (JWT, Hashing)
+├── database/       # Async Database Session & Base
 ├── models/         # SQLAlchemy ORM Models
-├── schemas/        # Pydantic Schemas (Request/Response)
-├── services/       # Business Logic & AI Services
-├── security/       # Authentication & Authorization
-├── middleware/     # Request middleware
-├── utils/          # Helper functions
-└── main.py         # Application Entry Point
+├── schemas/        # Pydantic Request/Response Models
+├── services/       # AI & Risk Logic
+└── main.py         # App Entry Point
 ```
 
-## 🔑 Key Components
+## 🚀 Getting Started
 
-### 1. Main Application (`main.py`)
-- Initializes the FastAPI app.
-- Includes API routers.
-- Defines the `/health` endpoint for system monitoring.
+### 1. Prerequisites
+- Python 3.9+
+- PostgreSQL
+- Virtual Environment
 
-### 2. Configuration (`config/settings.py`)
-- Manages environment variables using `pydantic-settings`.
-- Loads sensitive data (DB credentials, Secret Keys) from `.env`.
-
-### 3. Database (`database/session.py`)
-- Configures SQLAlchemy engine and session factory.
-- Provides `get_db()` dependency for dependency injection in API routes.
-
-## 📝 Logging System
-The project uses a centralized logging system located in `SRC/logs/logger.py`.
-Logs are routed to specific files in `SRC/logs/` based on the component:
-
-- **`backend_main.log`**: General application lifecycle events (Startup/Shutdown).
-- **`api.log`**: FastAPI request handling and route-specific logs.
-- **`database.log`**: Database connection events and SQL errors.
-- **`models.log`**: AI model inference logs (inputs/outputs/errors).
-
-To use the logger in your module:
-```python
-from SRC.logs.logger import get_logger
-logger = get_logger("api.my_module") # Will route to api.log
-logger.info("This is an info message")
+### 2. Environment Setup
+Create a `.env` file in the root directory:
+```bash
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=yourpassword
+POSTGRES_SERVER=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=fraud_detection_db
+SECRET_KEY=your_super_secret_key
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
-## 🚀 Development
-To run the application locally:
+### 3. Installation
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 4. Database Setup
+The application uses SQLAlchemy for ORM. Tables are created automatically on startup (dev mode) or via migration scripts.
+*Note: Ensure your PostgreSQL server is running and the database exists.*
+
+## 🏃 Running the Application
+Start the development server with hot-reload:
 ```bash
 uvicorn SRC.main:app --reload
 ```
+The API will be available at: `http://localhost:8000`
+Interactive Documentation: `http://localhost:8000/docs`
 
 ## 🧪 Testing
-- **Health Check**: `GET /health` - Verifies API status and DB connection.
+The project includes a comprehensive Async Test Suite using `pytest`.
+```bash
+PYTHONPATH=. pytest
+```
+Tests cover:
+- User Registration & Login
+- JWT Token Generation
+- Text, URL, and File Analysis flows
+- Database Persistence
+
+## 🔑 Key Features
+- **Async/Await**: Fully non-blocking I/O for database and generic tasks.
+- **Security**: Password hashing with `bcrypt`, JWT for stateless auth.
+- **Validation**: Strict data validation using `Pydantic`.
+- **Modularity**: Clean architecture separating Routes, Services, and Repositories.
+
+## 📄 API Documentation
+For detailed API endpoint usage, see [SRC/api/API_README.md](api/API_README.md).
