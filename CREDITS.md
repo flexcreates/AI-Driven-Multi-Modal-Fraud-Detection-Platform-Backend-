@@ -4,7 +4,6 @@
 
 **Developed by:** Aditya Singh (Flex)  
 **Role:** Backend Lead  
-**Team ID:** MLGUQ04A
 
 This module, including the FastAPI system architecture, PostgreSQL database design, risk scoring engine logic, and explainable AI integration, was architected and implemented by Aditya Singh.
 

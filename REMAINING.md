@@ -2,7 +2,6 @@
 
 **Project:** AI-Driven Multi-Modal Fraud Detection Platform  
 **Backend Status:** ✅ Complete & Tested (14/14 tests passing)  
-**Team ID:** MLGUQ04A
 
 ---
 

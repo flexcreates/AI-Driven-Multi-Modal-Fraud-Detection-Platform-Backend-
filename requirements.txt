@@ -7,6 +7,8 @@ pydantic
 pydantic-settings
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==4.0.1
+argon2-cffi
 python-multipart
 shap
 scikit-learn
@@ -18,3 +20,4 @@ asyncpg
 pytest
 pytest-asyncio
 httpx
+email_validator
